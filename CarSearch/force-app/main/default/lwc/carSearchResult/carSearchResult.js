@@ -1,0 +1,43 @@
+import { LightningElement, api, wire, track } from 'lwc';
+import getCars from '@salesforce/apex/CarSearchResultController.getCarResult';
+import { showToastEvent } from 'lightning/platformShowToastEvent';
+
+export default class CarSearchResult extends LightningElement {
+    @api carTypeId;
+
+
+    @track cars;
+
+    @wire(getCars, { carTypeId: '$carTypeId' })
+    wiredCars(data, error ) {
+        if (data) {
+            this.cars = data;
+            
+        }
+        else if (error) {
+            this.showToast('ERROR', error.body.message, 'error');
+        }
+    }
+
+
+    showToast(title, message, variant) {
+        const evt = new showToastEvent({
+            title: title,
+            message: message,
+            variant: variant,
+
+        })
+        this.dispatchEvent(evt);
+
+    }
+
+    get carsFound() {
+
+        if (this.cars) {
+            return true;
+
+        }
+        return false;
+    }
+
+}
